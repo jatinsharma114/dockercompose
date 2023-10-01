@@ -1,0 +1,32 @@
+version: '3'
+#co
+services:
+  mysql-db:
+    image: mysql
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: dockerapplication
+    networks:
+      - springboot-mysql-net
+
+  springboot-rest-apis:
+    build:
+      context: ./dockerapp
+      dockerfile: Dockerfile
+    ports:
+      - "8087:8087"
+    depends_on:
+      - mysql-db
+    environment:
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/dockerapplication?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    networks:
+      - springboot-mysql-net
+    restart: on-failure
+
+networks:
+  springboot-mysql-net:
